@@ -1,0 +1,28 @@
+<#@ output extension=".cs" #>
+using System;
+<#
+var retType = "TOutput";
+var tparamType = "<TOutput>";
+var body = "";
+var param = "";
+#>
+
+namespace HLib.Functional.Currying
+{
+    public static class CurryingExtensions
+    {
+        public static Func<TOutput> Currying<TOutput>(this Func<TOutput> f) => f;
+        public static Action Currying(this Action f) => f;
+    <# for (var i = 1; i <= 16; i++)
+    {
+        retType = retType.Replace("TOutput", $"Func<T{i}, TOutput>");
+        tparamType = tparamType.Replace("TOutput", $"T{i}, TOutput");
+        body += $"p{i} => ";
+        param += $"p{i}, "; #>
+    public static <#= retType #> Currying<#= tparamType #>(this Func<#= tparamType #> f) => <#= body #>f(<#= param.Substring(0, param.Length - 2) #>);
+    <# var index = retType.LastIndexOf("Func");
+       var actionRetType = retType.Replace(", TOutput", ""); 
+       if (index >= 0) actionRetType = actionRetType.Substring(0, index) + actionRetType.Substring(index).Replace("Func", "Action"); #>
+    public static <#= actionRetType #> Currying<#= tparamType.Replace(", TOutput", "") #>(this Action<#= tparamType.Replace(", TOutput", "") #> f) => <#= body #>f(<#= param.Substring(0, param.Length - 2) #>);
+    <# } #>}
+}
