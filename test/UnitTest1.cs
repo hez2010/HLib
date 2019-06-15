@@ -59,12 +59,12 @@ namespace HLib.Test
             var p = Test1Async(1).Then(x => Test2Async(x));
             Assert.AreEqual(3, await p);
 
-            var k = Test1Async(1).Then(x => Test2Async(x)).Then(async x => await Test3Async(x));
+            var k = Test1Async(1).Then(x => Test2Async(x)).Then(x => Test3Async(x));
             await k;
 
-            await Test3Async(3).Then(async () => await Test2Async(2));
+            await Test3Async(3).Then(() => Test2Async(2));
 
-            await Test3Async(3).Then(async () => await Test3Async(3));
+            await Test3Async(3).Then(() => Test3Async(3));
 
             Assert.AreEqual(9, invokedCount);
         }
